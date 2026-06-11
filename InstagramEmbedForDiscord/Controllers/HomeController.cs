@@ -73,6 +73,17 @@ public sealed class HomeController : Controller
 
             var segments = path.Trim('/').Split('/');
 
+            // A bare single segment is a username → redirect to the IG profile.
+            // (instagram.com/<username> is itself the profile page; there is no
+            //  single-segment post/reel form, so this never shadows an embed.)
+            if (segments.Length == 1)
+            {
+                string username = segments[0].TrimStart('@');
+                if (IsValidInstagramUsername(username))
+                    return Redirect($"https://instagram.com/{username}");
+                return NotFound();
+            }
+
             int orderIndex = 0;
             bool orderSpecified = false;
 
@@ -129,6 +140,11 @@ public sealed class HomeController : Controller
             return View("Error");
         }
     }
+
+    // Instagram usernames: 1-30 chars, letters/digits/period/underscore only.
+    private static bool IsValidInstagramUsername(string s) =>
+        s.Length is > 0 and <= 30 &&
+        s.All(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_');
 
 
 
