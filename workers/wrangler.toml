@@ -1,0 +1,19 @@
+name = "vxinstagram"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Favicons etc. — served before the Worker runs, like UseStaticFiles() did.
+[assets]
+directory = "./public"
+
+# 4h post cache.
+# Create with: wrangler kv namespace create CACHE
+[[kv_namespaces]]
+binding = "CACHE"
+id = "a15b36d5236d467d85bba28d45a914a3"
+
+# snapsave-media-downloader imports undici's ProxyAgent at top level but only
+# uses it when a proxy is configured; real undici can't bundle for Workers.
+[alias]
+"undici" = "./src/undici-stub.ts"
